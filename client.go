@@ -39,7 +39,7 @@ func main() {
 			comm = l3.Command{action: 4, name: split2[0], domain: split2[1], option: "", parameter: ""}
 		default:
 			log.Println("Ingrese un comando válido")
-			break
+			continue
 		}
 		runDNSIsAvailable(ac, command)
 	}
