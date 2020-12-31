@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("did not connect: %s", err)
 	}
 
-	ac := l3.NewBrokerClient
+	ac := l3.NewBrokerClient(conn)
 
 	var command string
 	var comm l3.Command
@@ -44,19 +44,20 @@ func main() {
 		split2 := strings.Split(split[0], ".")
 		switch split[0] {
 		case "Get":
-			comm = l3.Command{action: 4, name: split2[0], domain: split2[1], option: "", parameter: ""}
+			comm = l3.Command{Action: 4, Name: split2[0], Domain: split2[1], Option: "", Parameter: ""}
 		default:
 			log.Println("Ingrese un comando válido")
 			continue
 		}
 		runDNSIsAvailable(ac, command)
+
 	}
 
 }
 
 func runDNSIsAvailable(ac l3.BrokerClient, comm string) error {
-	msg := l3.Message{text: comm}
-	_, err := l3.DNSIsAvailable(context.Background(), &msg)
+	msg := l3.Message{Text: comm}
+	_, err := ac.DNSIsAvailable(context.Background(), &msg)
 	return err
 }
 
