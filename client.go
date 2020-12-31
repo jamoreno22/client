@@ -12,13 +12,21 @@ import (
 	"google.golang.org/grpc"
 )
 
+type consistency struct {
+	zfName string
+	rv     l3.VectorClock
+	ip     string
+}
+
+var cons consistency
+
 func main() {
 
-	var brokerIp string
-	brokerIp = "10.10.28.20:8000"
+	var brokerIP string
+	brokerIP = "10.10.28.20:8000"
 	var conn *grpc.ClientConn
 
-	conn, err := grpc.Dial(brokerIp, grpc.WithInsecure())
+	conn, err := grpc.Dial(brokerIP, grpc.WithInsecure())
 	if err != nil {
 		log.Fatalf("did not connect: %s", err)
 	}
