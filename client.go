@@ -18,7 +18,7 @@ type consistency struct {
 	ip     string
 }
 
-var cons consistency
+var cons []consistency
 
 func main() {
 
@@ -31,7 +31,7 @@ func main() {
 		log.Fatalf("did not connect: %s", err)
 	}
 
-	ac := l3.NewBrokerClient(conn)
+	cc := l3.NewBrokerClient(conn)
 
 	var command string
 	var comm l3.Command
@@ -49,15 +49,15 @@ func main() {
 			log.Println("Ingrese un comando válido")
 			continue
 		}
-		runDNSIsAvailable(ac, command)
+		runDNSIsAvailable(cc, command)
 
 	}
 
 }
 
-func runDNSIsAvailable(ac l3.BrokerClient, comm string) error {
+func runDNSIsAvailable(cc l3.BrokerClient, comm string) error {
 	msg := l3.Message{Text: comm}
-	_, err := ac.DNSIsAvailable(context.Background(), &msg)
+	_, err := cc.DNSIsAvailable(context.Background(), &msg)
 	return err
 }
 
@@ -68,4 +68,42 @@ func pingDataNode(ip string) bool {
 		return false
 	}
 	return true
+}
+
+func mReads(zfName string, rv *l3.VectorClock, ip *string, com *l3.Command){
+	if len(consList) != 0 {
+		for _, s := range consList {
+			if s.zfName == zfName {
+				spl := strings.Split(*ip, ".")
+				switch spl[3] {
+				case "17":
+					if s.rv.Rv1 <= /*no se de donde sacar el rvector que deberia tener*/ {
+						s.ip = *ip
+						s.rv = *actionRv
+						s.com = *com
+					} else {
+						log.Println("Existe un error en la consistencia")
+					}
+				case "18":
+					if s.rv.Rv2 <= /*no se de donde sacar el rvector que deberia tener*/ {
+						s.ip = *ip
+						s.rv = *actionRv
+						s.com = *com
+					} else {
+						log.Println("Existe un error en la consistencia")
+					}
+				case "19":
+					if s.rv.Rv3 <= /*no se de donde sacar el rvector que deberia tener*/ {
+						s.ip = *ip
+						s.rv = *actionRv
+						s.com = *com
+					} else {
+						log.Println("Existe un error en la consistencia")
+					}
+				}
+			}
+		}
+	} else {
+		consList = append(consList, &Consistency{zfName: zfName, rv: *rv, ip: *ip, com: *com})
+	}
 }
