@@ -12,13 +12,17 @@ import (
 	"google.golang.org/grpc"
 )
 
-type consistency struct {
+//Consistency struct
+type Consistency struct {
 	zfName string
 	rv     l3.VectorClock
 	ip     string
+	com    l3.Command
 }
 
-var cons []consistency
+var consList []*Consistency
+
+var getIPRv *l3.VectorClock
 
 func main() {
 
@@ -49,16 +53,42 @@ func main() {
 			log.Println("Ingrese un comando válido")
 			continue
 		}
-		runDNSIsAvailable(cc, command)
+		var dnsIP string
+		dnsIP = runDNSIsAvailable(cc, command)
+
+		var conn1 *grpc.ClientConn
+
+		conn1, err1 := grpc.Dial(dnsIP, grpc.WithInsecure())
+		if err1 != nil {
+			log.Fatalf("did not connect: %s", err)
+		}
+
+		dnsc := l3.NewDNSClient(conn1)
+
+		getIPRv, _ = dnsc.GetIP(context.Background(), &comm)
+
+		mReads(comm.Domain, &dnsIP, &comm)
 
 	}
 
 }
 
-func runDNSIsAvailable(cc l3.BrokerClient, comm string) error {
+func runDNSIsAvailable(cc l3.BrokerClient, comm string) string {
 	msg := l3.Message{Text: comm}
-	_, err := cc.DNSIsAvailable(context.Background(), &msg)
-	return err
+	state, err := cc.DNSIsAvailable(context.Background(), &msg)
+	if err != nil {
+		fmt.Println("DNSIsAvailable error")
+	}
+	dnsIps := []string{"10.10.28.17:8000", "10.10.28.18:8000", "10.10.28.19:8000"}
+	if state.Dns1 == true {
+		return dnsIps[0]
+	} else if state.Dns2 == true {
+		return dnsIps[1]
+	} else if state.Dns3 == true {
+		return dnsIps[2]
+	}
+	log.Fatalln("Dns servers not available")
+	return "Dns not available"
 }
 
 func pingDataNode(ip string) bool {
@@ -70,33 +100,51 @@ func pingDataNode(ip string) bool {
 	return true
 }
 
-func mReads(zfName string, rv *l3.VectorClock, ip *string, com *l3.Command){
+func mReads(zfName string, ip *string, comm *l3.Command) {
 	if len(consList) != 0 {
 		for _, s := range consList {
 			if s.zfName == zfName {
 				spl := strings.Split(*ip, ".")
 				switch spl[3] {
 				case "17":
-					if s.rv.Rv1 <= /*no se de donde sacar el rvector que deberia tener*/ {
+					if s.rv.Rv1 <= getIPRv.Rv1 {
 						s.ip = *ip
-						s.rv = *actionRv
-						s.com = *com
+						s.rv.Rv1 = getIPRv.Rv1
+						s.rv.Rv2 = getIPRv.Rv2
+						s.rv.Rv3 = getIPRv.Rv3
+						s.com.Domain = comm.Domain
+						s.com.Ip = comm.Ip
+						s.com.Name = comm.Name
+						s.com.Option = comm.Option
+						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
 				case "18":
-					if s.rv.Rv2 <= /*no se de donde sacar el rvector que deberia tener*/ {
+					if s.rv.Rv2 <= getIPRv.Rv2 {
 						s.ip = *ip
-						s.rv = *actionRv
-						s.com = *com
+						s.rv.Rv1 = getIPRv.Rv1
+						s.rv.Rv2 = getIPRv.Rv2
+						s.rv.Rv3 = getIPRv.Rv3
+						s.com.Domain = comm.Domain
+						s.com.Ip = comm.Ip
+						s.com.Name = comm.Name
+						s.com.Option = comm.Option
+						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
 				case "19":
-					if s.rv.Rv3 <= /*no se de donde sacar el rvector que deberia tener*/ {
+					if s.rv.Rv3 <= getIPRv.Rv3 {
 						s.ip = *ip
-						s.rv = *actionRv
-						s.com = *com
+						s.rv.Rv1 = getIPRv.Rv1
+						s.rv.Rv2 = getIPRv.Rv2
+						s.rv.Rv3 = getIPRv.Rv3
+						s.com.Domain = comm.Domain
+						s.com.Ip = comm.Ip
+						s.com.Name = comm.Name
+						s.com.Option = comm.Option
+						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
@@ -104,6 +152,8 @@ func mReads(zfName string, rv *l3.VectorClock, ip *string, com *l3.Command){
 			}
 		}
 	} else {
-		consList = append(consList, &Consistency{zfName: zfName, rv: *rv, ip: *ip, com: *com})
+		consList = append(consList, &Consistency{zfName: comm.Domain,
+			rv: l3.VectorClock{Name: comm.Domain, Rv1: 0, Rv2: 0, Rv3: 0},
+			ip: *ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
 	}
 }
