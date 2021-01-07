@@ -53,22 +53,10 @@ func main() {
 			log.Println("Ingrese un comando válido")
 			continue
 		}
-		var dnsIP string
-		dnsIP = runDNSIsAvailable(cc, command)
 
-		var conn1 *grpc.ClientConn
+		localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-		conn1, err1 := grpc.Dial(dnsIP, grpc.WithInsecure())
-		if err1 != nil {
-			log.Fatalf("did not connect: %s", err)
-		}
-
-		dnsc := l3.NewDNSClient(conn1)
-
-		getIPRv, _ = dnsc.GetIP(context.Background(), &comm)
-
-		mReads(comm.Domain, &dnsIP, &comm)
-
+		mReads(comm.Domain, &localPageInfo.DnsIP, &comm)
 	}
 
 }
