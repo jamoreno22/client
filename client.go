@@ -60,8 +60,6 @@ func main() {
 
 			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-			fmt.Println("LocalPageInfo: ", localPageInfo)
-
 			fmt.Println(mReads(comm.Domain, localPageInfo.DnsIP, &comm))
 		}
 	}
@@ -101,50 +99,35 @@ func mReads(zfName string, ip string, comm *l3.Command) string {
 			if s.zfName == zfName {
 				spl := strings.Split(ip, ".")
 				switch spl[3] {
-				case "17":
+				case "17:8000":
 					if s.rv.Rv1 <= getIPRv.Rv1 {
 						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
-						s.com.Domain = comm.Domain
-						s.com.Ip = comm.Ip
-						s.com.Name = comm.Name
-						s.com.Option = comm.Option
-						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
-				case "18":
+				case "18:8000":
 					if s.rv.Rv2 <= getIPRv.Rv2 {
 						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
-						s.com.Domain = comm.Domain
-						s.com.Ip = comm.Ip
-						s.com.Name = comm.Name
-						s.com.Option = comm.Option
-						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
-				case "19":
+				case "19:8000":
 					if s.rv.Rv3 <= getIPRv.Rv3 {
 						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
-						s.com.Domain = comm.Domain
-						s.com.Ip = comm.Ip
-						s.com.Name = comm.Name
-						s.com.Option = comm.Option
-						s.com.Parameter = comm.Parameter
 					} else {
 						log.Println("Existe un error en la consistencia")
 					}
 				}
-				return "ip: " + s.ip
+				return "uwu"
 			}
 		}
 	} else {
@@ -152,5 +135,5 @@ func mReads(zfName string, ip string, comm *l3.Command) string {
 			rv: l3.VectorClock{Name: comm.Domain, Rv1: 0, Rv2: 0, Rv3: 0},
 			ip: ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
 	}
-	return ip
+	return "ywy"
 }
