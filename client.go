@@ -49,7 +49,7 @@ func main() {
 		if scanner.Scan() {
 			command := scanner.Text()
 			split := strings.Split(command, " ")
-			split2 := strings.Split(split[0], ".")
+			split2 := strings.Split(split[1], ".")
 			switch split[0] {
 			case "Get":
 				comm = l3.Command{Action: 4, Name: split2[0], Domain: split2[1], Option: "", Parameter: ""}
