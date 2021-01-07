@@ -47,7 +47,7 @@ func main() {
 		fmt.Println("Ingrese comando")
 		scanner := bufio.NewScanner(os.Stdin)
 		if scanner.Scan() {
-			command := scanner.Text()
+			command = scanner.Text()
 			split := strings.Split(command, " ")
 			split2 := strings.Split(split[0], ".")
 			switch split[0] {
