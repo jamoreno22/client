@@ -149,6 +149,6 @@ func mReads(zfName string, ip string, comm *l3.Command) string {
 		consList = append(consList, &Consistency{zfName: comm.Domain,
 			rv: l3.VectorClock{Name: comm.Domain, Rv1: 0, Rv2: 0, Rv3: 0},
 			ip: ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
-		return "Hola, no se cómo llegamos aquí"
 	}
+	return "Hola, no se cómo llegamos aquí"
 }
