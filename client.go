@@ -60,9 +60,6 @@ func main() {
 
 			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-			log.Println(localPageInfo)
-			log.Println(comm.Domain)
-
 			mReads(comm.Domain, localPageInfo.DnsIP, &comm)
 		}
 	}
