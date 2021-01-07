@@ -60,7 +60,7 @@ func main() {
 
 			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-			mReads(comm.Domain, &localPageInfo.DnsIP, &comm)
+			mReads(comm.Domain, localPageInfo.DnsIP, &comm)
 		}
 	}
 
@@ -93,15 +93,15 @@ func pingDataNode(ip string) bool {
 	return true
 }
 
-func mReads(zfName string, ip *string, comm *l3.Command) {
+func mReads(zfName string, ip string, comm *l3.Command) {
 	if len(consList) != 0 {
 		for _, s := range consList {
 			if s.zfName == zfName {
-				spl := strings.Split(*ip, ".")
+				spl := strings.Split(ip, ".")
 				switch spl[3] {
 				case "17":
 					if s.rv.Rv1 <= getIPRv.Rv1 {
-						s.ip = *ip
+						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
@@ -115,7 +115,7 @@ func mReads(zfName string, ip *string, comm *l3.Command) {
 					}
 				case "18":
 					if s.rv.Rv2 <= getIPRv.Rv2 {
-						s.ip = *ip
+						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
@@ -129,7 +129,7 @@ func mReads(zfName string, ip *string, comm *l3.Command) {
 					}
 				case "19":
 					if s.rv.Rv3 <= getIPRv.Rv3 {
-						s.ip = *ip
+						s.ip = ip
 						s.rv.Rv1 = getIPRv.Rv1
 						s.rv.Rv2 = getIPRv.Rv2
 						s.rv.Rv3 = getIPRv.Rv3
@@ -147,6 +147,6 @@ func mReads(zfName string, ip *string, comm *l3.Command) {
 	} else {
 		consList = append(consList, &Consistency{zfName: comm.Domain,
 			rv: l3.VectorClock{Name: comm.Domain, Rv1: 0, Rv2: 0, Rv3: 0},
-			ip: *ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
+			ip: ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
 	}
 }
