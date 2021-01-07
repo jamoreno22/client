@@ -60,7 +60,7 @@ func main() {
 
 			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-			mReads(comm.Domain, localPageInfo.DnsIP, &comm)
+			log.Println(mReads(comm.Domain, localPageInfo.DnsIP, &comm))
 		}
 	}
 
@@ -93,7 +93,7 @@ func pingDataNode(ip string) bool {
 	return true
 }
 
-func mReads(zfName string, ip string, comm *l3.Command) {
+func mReads(zfName string, ip string, comm *l3.Command) string {
 	if len(consList) != 0 {
 		for _, s := range consList {
 			if s.zfName == zfName {
@@ -142,11 +142,13 @@ func mReads(zfName string, ip string, comm *l3.Command) {
 						log.Println("Existe un error en la consistencia")
 					}
 				}
+				return "ip: " + s.ip
 			}
 		}
 	} else {
 		consList = append(consList, &Consistency{zfName: comm.Domain,
 			rv: l3.VectorClock{Name: comm.Domain, Rv1: 0, Rv2: 0, Rv3: 0},
 			ip: ip, com: l3.Command{Action: comm.Action, Name: comm.Name, Domain: comm.Domain, Option: comm.Option, Parameter: comm.Parameter, Ip: comm.Ip}})
+		return "Hola, no se cómo llegamos aquí"
 	}
 }
