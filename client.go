@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log"
 	"net"
+	"os"
 	"strings"
 	"time"
 
@@ -42,21 +44,23 @@ func main() {
 
 	defer conn.Close()
 	for {
-		fmt.Println("Ingrese comando")
-		fmt.Scanln(&command)
-		split := strings.Split(command, " ")
-		split2 := strings.Split(split[0], ".")
-		switch split[0] {
-		case "Get":
-			comm = l3.Command{Action: 4, Name: split2[0], Domain: split2[1], Option: "", Parameter: ""}
-		default:
-			log.Println("Ingrese un comando válido")
-			continue
+		scanner := bufio.NewScanner(os.Stdin)
+		if scanner.Scan() {
+			command = scanner.Text()
+			split := strings.Split(command, " ")
+			split2 := strings.Split(split[0], ".")
+			switch split[0] {
+			case "Get":
+				comm = l3.Command{Action: 4, Name: split2[0], Domain: split2[1], Option: "", Parameter: ""}
+			default:
+				log.Println("Ingrese un comando válido")
+				continue
+			}
+
+			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
+
+			mReads(comm.Domain, &localPageInfo.DnsIP, &comm)
 		}
-
-		localPageInfo, _ := cc.GetIP(context.Background(), &comm)
-
-		mReads(comm.Domain, &localPageInfo.DnsIP, &comm)
 	}
 
 }
