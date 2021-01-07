@@ -53,7 +53,6 @@ func main() {
 			switch split[0] {
 			case "Get":
 				comm = l3.Command{Action: 4, Name: split2[0], Domain: split2[1], Option: "", Parameter: "", Ip: ""}
-				log.Println(comm.Name)
 			default:
 				log.Println("Ingrese un comando válido")
 				continue
@@ -61,7 +60,7 @@ func main() {
 
 			localPageInfo, _ := cc.GetIP(context.Background(), &comm)
 
-			log.Println(mReads(comm.Domain, localPageInfo.DnsIP, &comm))
+			fmt.Println(mReads(comm.Domain, localPageInfo.DnsIP, &comm))
 		}
 	}
 
